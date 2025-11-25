@@ -5924,6 +5924,267 @@ class RealmLibrary {
       bool Function(ffi.Pointer<realm_t>, ffi.Pointer<ffi.Bool>,
           ffi.Pointer<realm_version_id_t>)>();
 
+  /// Create an HNSW index on a List<double> property.
+  ///
+  /// This must be called before performing vector searches on a property.
+  /// The property must be of type List<double>.
+  ///
+  /// @param realm The realm instance (must be in a write transaction).
+  /// @param class_key The class containing the vector property.
+  /// @param property_key The property key of the List<double> vector property.
+  /// @param M Number of bidirectional links created for each node (except layer 0). Default: 16.
+  /// @param ef_construction Size of dynamic candidate list during construction. Default: 200.
+  /// @param metric Distance metric to use.
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_create_index(
+    ffi.Pointer<realm_t> realm,
+    Dartrealm_class_key_t class_key,
+    Dartrealm_property_key_t property_key,
+    int M,
+    int ef_construction,
+    realm_hnsw_distance_metric metric,
+  ) {
+    return _realm_hnsw_create_index(
+      realm,
+      class_key,
+      property_key,
+      M,
+      ef_construction,
+      metric.value,
+    );
+  }
+
+  late final _realm_hnsw_create_indexPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<realm_t>,
+              realm_class_key_t,
+              realm_property_key_t,
+              ffi.Size,
+              ffi.Size,
+              ffi.UnsignedInt)>>('realm_hnsw_create_index');
+  late final _realm_hnsw_create_index = _realm_hnsw_create_indexPtr.asFunction<
+      bool Function(ffi.Pointer<realm_t>, int, int, int, int, int)>();
+
+  /// Get statistics about an HNSW index.
+  ///
+  /// @param realm The realm instance.
+  /// @param class_key The class containing the vector property.
+  /// @param property_key The property key with the HNSW index.
+  /// @param out_num_vectors Pointer to store the number of vectors in the index.
+  /// @param out_max_layer Pointer to store the maximum layer in the index.
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_get_stats(
+    ffi.Pointer<realm_t> realm,
+    int class_key,
+    int property_key,
+    ffi.Pointer<ffi.Size> out_num_vectors,
+    ffi.Pointer<ffi.Int> out_max_layer,
+  ) {
+    return _realm_hnsw_get_stats(
+      realm,
+      class_key,
+      property_key,
+      out_num_vectors,
+      out_max_layer,
+    );
+  }
+
+  late final _realm_hnsw_get_statsPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<realm_t>,
+              realm_class_key_t,
+              realm_property_key_t,
+              ffi.Pointer<ffi.Size>,
+              ffi.Pointer<ffi.Int>)>>('realm_hnsw_get_stats');
+  late final _realm_hnsw_get_stats = _realm_hnsw_get_statsPtr.asFunction<
+      bool Function(ffi.Pointer<realm_t>, int, int, ffi.Pointer<ffi.Size>,
+          ffi.Pointer<ffi.Int>)>();
+
+  /// Check if a property has an HNSW index.
+  ///
+  /// @param realm The realm instance.
+  /// @param class_key The class containing the property.
+  /// @param property_key The property key to check.
+  /// @param out_has_index Pointer to store the result (true if index exists).
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_has_index(
+    ffi.Pointer<realm_t> realm,
+    int class_key,
+    int property_key,
+    ffi.Pointer<ffi.Bool> out_has_index,
+  ) {
+    return _realm_hnsw_has_index(
+      realm,
+      class_key,
+      property_key,
+      out_has_index,
+    );
+  }
+
+  late final _realm_hnsw_has_indexPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<realm_t>,
+              realm_class_key_t,
+              realm_property_key_t,
+              ffi.Pointer<ffi.Bool>)>>('realm_hnsw_has_index');
+  late final _realm_hnsw_has_index = _realm_hnsw_has_indexPtr.asFunction<
+      bool Function(ffi.Pointer<realm_t>, int, int, ffi.Pointer<ffi.Bool>)>();
+
+  /// Remove an HNSW index from a property.
+  ///
+  /// @param realm The realm instance (must be in a write transaction).
+  /// @param class_key The class containing the vector property.
+  /// @param property_key The property key with the HNSW index.
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_remove_index(
+    ffi.Pointer<realm_t> realm,
+    int class_key,
+    int property_key,
+  ) {
+    return _realm_hnsw_remove_index(
+      realm,
+      class_key,
+      property_key,
+    );
+  }
+
+  late final _realm_hnsw_remove_indexPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(ffi.Pointer<realm_t>, realm_class_key_t,
+              realm_property_key_t)>>('realm_hnsw_remove_index');
+  late final _realm_hnsw_remove_index = _realm_hnsw_remove_indexPtr
+      .asFunction<bool Function(ffi.Pointer<realm_t>, int, int)>();
+
+  /// Search for k-nearest neighbors in a vector property.
+  ///
+  /// This function performs an approximate nearest neighbor search using the HNSW index
+  /// on a List<double> property. The property must have an HNSW index created on it.
+  ///
+  /// @param realm The realm instance.
+  /// @param class_key The class containing the vector property.
+  /// @param property_key The property key of the List<double> vector property.
+  /// @param query_vector Pointer to the query vector data.
+  /// @param vector_size The dimension of the query vector.
+  /// @param k Number of nearest neighbors to find.
+  /// @param ef_search Size of dynamic candidate list (0 to use config default).
+  /// @param out_results Output array to store the results. Must be pre-allocated with at least k elements.
+  /// @param out_num_results Pointer to store the actual number of results returned (may be less than k).
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_search_knn(
+    ffi.Pointer<realm_t> realm,
+    int class_key,
+    int property_key,
+    ffi.Pointer<ffi.Double> query_vector,
+    int vector_size,
+    int k,
+    int ef_search,
+    ffi.Pointer<realm_hnsw_search_result_t> out_results,
+    ffi.Pointer<ffi.Size> out_num_results,
+  ) {
+    return _realm_hnsw_search_knn(
+      realm,
+      class_key,
+      property_key,
+      query_vector,
+      vector_size,
+      k,
+      ef_search,
+      out_results,
+      out_num_results,
+    );
+  }
+
+  late final _realm_hnsw_search_knnPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<realm_t>,
+              realm_class_key_t,
+              realm_property_key_t,
+              ffi.Pointer<ffi.Double>,
+              ffi.Size,
+              ffi.Size,
+              ffi.Size,
+              ffi.Pointer<realm_hnsw_search_result_t>,
+              ffi.Pointer<ffi.Size>)>>('realm_hnsw_search_knn');
+  late final _realm_hnsw_search_knn = _realm_hnsw_search_knnPtr.asFunction<
+      bool Function(
+          ffi.Pointer<realm_t>,
+          int,
+          int,
+          ffi.Pointer<ffi.Double>,
+          int,
+          int,
+          int,
+          ffi.Pointer<realm_hnsw_search_result_t>,
+          ffi.Pointer<ffi.Size>)>();
+
+  /// Search for all vectors within a distance threshold.
+  ///
+  /// This function performs a radius search using the HNSW index on a List<double> property.
+  /// Returns all vectors within the specified maximum distance from the query vector.
+  ///
+  /// @param realm The realm instance.
+  /// @param class_key The class containing the vector property.
+  /// @param property_key The property key of the List<double> vector property.
+  /// @param query_vector Pointer to the query vector data.
+  /// @param vector_size The dimension of the query vector.
+  /// @param max_distance Maximum distance threshold.
+  /// @param out_results Output array to store the results. Caller is responsible for allocation.
+  /// @param max_results Maximum number of results to return.
+  /// @param out_num_results Pointer to store the actual number of results returned.
+  /// @return true if successful, false if an error occurred.
+  bool realm_hnsw_search_radius(
+    ffi.Pointer<realm_t> realm,
+    int class_key,
+    int property_key,
+    ffi.Pointer<ffi.Double> query_vector,
+    int vector_size,
+    double max_distance,
+    ffi.Pointer<realm_hnsw_search_result_t> out_results,
+    int max_results,
+    ffi.Pointer<ffi.Size> out_num_results,
+  ) {
+    return _realm_hnsw_search_radius(
+      realm,
+      class_key,
+      property_key,
+      query_vector,
+      vector_size,
+      max_distance,
+      out_results,
+      max_results,
+      out_num_results,
+    );
+  }
+
+  late final _realm_hnsw_search_radiusPtr = _lookup<
+      ffi.NativeFunction<
+          ffi.Bool Function(
+              ffi.Pointer<realm_t>,
+              realm_class_key_t,
+              realm_property_key_t,
+              ffi.Pointer<ffi.Double>,
+              ffi.Size,
+              ffi.Double,
+              ffi.Pointer<realm_hnsw_search_result_t>,
+              ffi.Size,
+              ffi.Pointer<ffi.Size>)>>('realm_hnsw_search_radius');
+  late final _realm_hnsw_search_radius =
+      _realm_hnsw_search_radiusPtr.asFunction<
+          bool Function(
+              ffi.Pointer<realm_t>,
+              int,
+              int,
+              ffi.Pointer<ffi.Double>,
+              int,
+              double,
+              ffi.Pointer<realm_hnsw_search_result_t>,
+              int,
+              ffi.Pointer<ffi.Size>)>();
+
   /// Complete a HTTP request with the given response.
   ///
   /// @param request_context Internal state pointer passed by Core when invoking realm_http_request_func_t
@@ -12717,6 +12978,43 @@ typedef realm_free_userdata_func_tFunction = ffi.Void Function(
 typedef Dartrealm_free_userdata_func_tFunction = void Function(
     ffi.Pointer<ffi.Void> userdata);
 
+/// Distance metric types for HNSW vector search.
+enum realm_hnsw_distance_metric {
+  /// L2 distance
+  RLM_HNSW_METRIC_EUCLIDEAN(0),
+
+  /// Cosine similarity (1 - cosine_similarity)
+  RLM_HNSW_METRIC_COSINE(1),
+
+  /// Negative dot product (for maximum inner product search)
+  RLM_HNSW_METRIC_DOT_PRODUCT(2);
+
+  final int value;
+  const realm_hnsw_distance_metric(this.value);
+
+  static realm_hnsw_distance_metric fromValue(int value) => switch (value) {
+        0 => RLM_HNSW_METRIC_EUCLIDEAN,
+        1 => RLM_HNSW_METRIC_COSINE,
+        2 => RLM_HNSW_METRIC_DOT_PRODUCT,
+        _ => throw ArgumentError(
+            'Unknown value for realm_hnsw_distance_metric: $value'),
+      };
+}
+
+/// Result structure for vector search operations.
+/// Contains an object key and its distance to the query vector.
+final class realm_hnsw_search_result extends ffi.Struct {
+  @realm_object_key_t()
+  external int object_key;
+
+  @ffi.Double()
+  external double distance;
+}
+
+/// Result structure for vector search operations.
+/// Contains an object key and its distance to the query vector.
+typedef realm_hnsw_search_result_t = realm_hnsw_search_result;
+
 final class realm_http_header extends ffi.Struct {
   external ffi.Pointer<ffi.Char> name;
 
@@ -13973,9 +14271,6 @@ enum realm_web_socket_errno {
   RLM_ERR_WEBSOCKET_UNAUTHORIZED(4001),
   RLM_ERR_WEBSOCKET_FORBIDDEN(4002),
   RLM_ERR_WEBSOCKET_MOVEDPERMANENTLY(4003),
-  RLM_ERR_WEBSOCKET_CLIENT_TOO_OLD(4004),
-  RLM_ERR_WEBSOCKET_CLIENT_TOO_NEW(4005),
-  RLM_ERR_WEBSOCKET_PROTOCOL_MISMATCH(4006),
   RLM_ERR_WEBSOCKET_RESOLVE_FAILED(4400),
   RLM_ERR_WEBSOCKET_CONNECTION_FAILED(4401),
   RLM_ERR_WEBSOCKET_READ_ERROR(4402),
@@ -14003,9 +14298,6 @@ enum realm_web_socket_errno {
         4001 => RLM_ERR_WEBSOCKET_UNAUTHORIZED,
         4002 => RLM_ERR_WEBSOCKET_FORBIDDEN,
         4003 => RLM_ERR_WEBSOCKET_MOVEDPERMANENTLY,
-        4004 => RLM_ERR_WEBSOCKET_CLIENT_TOO_OLD,
-        4005 => RLM_ERR_WEBSOCKET_CLIENT_TOO_NEW,
-        4006 => RLM_ERR_WEBSOCKET_PROTOCOL_MISMATCH,
         4400 => RLM_ERR_WEBSOCKET_RESOLVE_FAILED,
         4401 => RLM_ERR_WEBSOCKET_CONNECTION_FAILED,
         4402 => RLM_ERR_WEBSOCKET_READ_ERROR,
