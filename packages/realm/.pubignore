@@ -1,12 +1,12 @@
 # ignore realm files
 *.realm*
 
-# Ignore symlinks
-# Unfortuantely this don't work. We need to remove the symlinks before publishing
-/android/src/main/cpp/lib/
-/ios/realm_flutter_ios.xcframework
-# No symlink for macos
-# /macos/librealm_dart.dylib
+# Platform sources and binaries needed for Flutter plugin publishing
+# Do NOT exclude iOS/Android/macOS/Windows/Linux plugin sources or xcframeworks.
+# If you previously used symlinks, replace them with real files before publishing.
+# Allow iOS xcframework and Android native sources to be included in the package.
+
+# Keep excluding temporary build artifacts only (not plugin sources).
 /windows/binary
 /linux/binary
 

@@ -1,7 +1,7 @@
 // Copyright 2024 MongoDB, Inc.
 // SPDX-License-Identifier: Apache-2.0
 
-import 'package:realm/realm.dart';
+import 'package:realm_flutter_vector_db/realm_vector_db.dart';
 
 part 'article.realm.dart';
 

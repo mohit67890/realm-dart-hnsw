@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import 'package:flutter/material.dart';
-import 'package:realm/realm.dart';
+import 'package:realm_flutter_vector_db/realm_vector_db.dart';
 import '../models/article.dart';
 import '../services/realm_service.dart';
 import 'search_screen.dart';

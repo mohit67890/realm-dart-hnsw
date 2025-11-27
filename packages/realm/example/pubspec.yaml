@@ -6,12 +6,12 @@ publish_to: "none"
 
 environment:
   sdk: ^3.6.0
-  flutter: ^3.27.0
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  realm:
+  realm_flutter_vector_db:
     path: ../
   characters: ^1.4.0
 

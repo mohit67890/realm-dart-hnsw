@@ -95,7 +95,7 @@ tasks.register("runMetrics", Exec) {
             def conf = appProject.android.defaultConfig
             targetOsVersion = "API Level ${conf.targetSdkVersion.apiLevel}"
         }
-        commandLine dartExecutable, 'run', 'realm', 'metrics', '--flutter-root', flutterRoot, '--target-os-type', 'android', '--target-os-version', targetOsVersion
+        commandLine dartExecutable, 'run', 'realm_flutter_vector_db', 'metrics', '--flutter-root', flutterRoot, '--target-os-type', 'android', '--target-os-version', targetOsVersion
     }
     catch (e) {
         logger.error "Error running metrics command $e"
@@ -107,7 +107,7 @@ tasks.register("downloadRealmBinaries", Exec) {
 
     def (flutterRoot, dartExecutable) = getPaths()
     workingDir "${project.rootProject.projectDir}${File.separator}.."
-    commandLine dartExecutable, 'run', 'realm', 'install', '--target-os-type', 'android'
+    commandLine dartExecutable, 'run', 'realm_flutter_vector_db', 'install', '--target-os-type', 'android'
 }
 
 def getBundleId() {
